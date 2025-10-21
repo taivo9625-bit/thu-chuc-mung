@@ -53,7 +53,7 @@
       clip-path: polygon(0 0, 100% 0, 50% 100%);
       transform-origin: top center;
       transition: transform 0.8s ease-in-out;
-      z-index: 2;
+      z-index: 3; /* <-- cao nhất */
     }
 
     /* Tờ giấy bên trong */
@@ -73,7 +73,7 @@
       flex-direction: column;
       transition: transform 0.8s ease-in-out, opacity 0.5s ease;
       opacity: 0;
-      z-index: 0;
+      z-index: 2; /* <-- nằm giữa flap và body */
     }
 
     .message h1 {
@@ -90,6 +90,7 @@
     /* Khi mở */
     .open .envelope-flap {
       transform: rotateX(180deg);
+      z-index: 0; /* <-- đẩy flap ra sau để không che giấy */
     }
     .open .paper {
       transform: translate(-50%, -20%);
@@ -112,7 +113,7 @@
       <div class="paper">
         <div class="message">
           <h1>20/10 Vui Vẻ 🎉</h1>
-          <p>Chúc bạn luôn xinh đẹp và hạnh phúc nhé 💖</p>
+          <p>Chúc bạn luôn xinh đẹp, rạng rỡ và hạnh phúc nhé 💖</p>
         </div>
       </div>
     </div>
