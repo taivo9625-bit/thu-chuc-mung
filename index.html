@@ -3,89 +3,127 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Thiệp 20/10 — Click để mở</title>
+  <title>Thiệp 20/10 — Mở thư 💌</title>
   <style>
-    :root{--bg:#fff0f6;--card:#ffd9e8;--paper:#fff;--accent:#ff6f91}
-    *{box-sizing:border-box}
-    body{min-height:100vh;display:grid;place-items:center;margin:0;background:linear-gradient(135deg,#fff0f6 0%, #ffeef6 100%);font-family:Inter, 'Segoe UI', Roboto, Arial}
+    :root {
+      --bg: #fff0f6;
+      --envelope: #ffb6c1;
+      --paper: #fff;
+      --accent: #ff5c8a;
+    }
+    * { box-sizing: border-box; }
+    body {
+      height: 100vh;
+      margin: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #fff0f6, #ffe6ef);
+      font-family: 'Poppins', sans-serif;
+    }
 
-    .scene{width:360px;max-width:90vw}
+    .envelope {
+      position: relative;
+      width: 340px;
+      height: 240px;
+      cursor: pointer;
+      perspective: 1000px;
+    }
 
-    /* Envelope */
-    .envelope{position:relative;width:100%;height:220px;cursor:pointer;perspective:900px}
-    .back, .front, .paper{position:absolute;left:0;right:0;margin:auto;border-radius:12px}
+    /* Phần thân thư */
+    .envelope-body {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: var(--envelope);
+      border-radius: 0 0 12px 12px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+      overflow: hidden;
+      z-index: 1;
+    }
 
-    .back{top:20px;height:180px;background:linear-gradient(180deg,#ffd9e8,#ffd0e0);box-shadow:0 10px 30px rgba(0,0,0,0.12);border:1px solid rgba(0,0,0,0.03);transform-origin:top center;z-index:1}
-    .front{top:0;height:120px;background:linear-gradient(180deg,#ffb6cf,#ffa7c0);clip-path:polygon(0 0,100% 0,50% 85%);transform-origin:top center;z-index:3;transition:transform 600ms cubic-bezier(.2,.9,.2,1)}
+    /* Nắp thư */
+    .envelope-flap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 120px;
+      background: linear-gradient(180deg, #ff9eb8, #ff7fa1);
+      clip-path: polygon(0 0, 100% 0, 50% 100%);
+      transform-origin: top center;
+      transition: transform 0.8s ease-in-out;
+      z-index: 2;
+    }
 
-    /* Paper inside */
-    .paper{top:42px;height:150px;background:var(--paper);width:88%;padding:22px;z-index:2;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.08);left:6%;transition:transform 600ms cubic-bezier(.2,.9,.2,1)}
+    /* Tờ giấy bên trong */
+    .paper {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translate(-50%, 80%);
+      width: 90%;
+      height: 160px;
+      background: var(--paper);
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      transition: transform 0.8s ease-in-out, opacity 0.5s ease;
+      opacity: 0;
+      z-index: 0;
+    }
 
-    /* Closed state */
-    .envelope:not(.open) .front{transform:translateY(0) rotateX(0)}
-    .envelope:not(.open) .paper{transform:translateY(40px) scale(0.98);opacity:0}
+    .message h1 {
+      margin: 0;
+      font-size: 28px;
+      color: #ff2e63;
+    }
+    .message p {
+      margin: 8px 0 0;
+      color: #444;
+      font-size: 16px;
+    }
 
-    /* Open state */
-    .envelope.open .front{transform:translateY(-80px) rotateX(25deg)}
-    .envelope.open .paper{transform:translateY(-10px) scale(1);opacity:1}
+    /* Khi mở */
+    .open .envelope-flap {
+      transform: rotateX(180deg);
+    }
+    .open .paper {
+      transform: translate(-50%, -20%);
+      opacity: 1;
+    }
 
-    /* Message */
-    .message{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;text-align:center;color:#333}
-    .message h1{margin:0;font-size:28px;letter-spacing:1px}
-    .message p{margin:8px 0 0;font-size:16px;color:#555}
-
-    .hearts{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);display:flex;gap:8px}
-    .heart{width:14px;height:14px;border-radius:50%;background:var(--accent);transform:rotate(-25deg);box-shadow:0 6px 12px rgba(255,111,145,0.18)}
-
-    /* Click hint */
-    .hint{margin-top:14px;text-align:center;color:#6b6b6b;font-size:14px}
-
-    /* small responsive */
-    @media (max-width:420px){.envelope{height:200px}.paper{padding:16px}}
+    .hint {
+      text-align: center;
+      margin-top: 12px;
+      color: #666;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
-  <div class="scene">
-    <div id="env" class="envelope" aria-label="Thiệp 20/10, nhấn để mở" role="button" tabindex="0">
-      <div class="back"></div>
-      <div class="paper" id="paper">
+  <div>
+    <div id="envelope" class="envelope">
+      <div class="envelope-flap"></div>
+      <div class="envelope-body"></div>
+      <div class="paper">
         <div class="message">
-          <h1 id="msg" style="opacity:0;transform:translateY(8px);transition:all 420ms ease">20/10 Vui Vẻ 🎉</h1>
-          <p id="sub" style="opacity:0;transform:translateY(8px);transition:all 540ms ease">Chúc bạn một ngày đầy nụ cười và hạnh phúc.</p>
+          <h1>20/10 Vui Vẻ 🎉</h1>
+          <p>Chúc bạn luôn xinh đẹp và hạnh phúc nhé 💖</p>
         </div>
       </div>
-      <div class="front"></div>
-      <div class="hearts">
-        <div class="heart" style="transform:scale(1) rotate(-25deg)"></div>
-        <div class="heart" style="transform:scale(0.85) rotate(-15deg)"></div>
-        <div class="heart" style="transform:scale(0.7) rotate(-5deg)"></div>
-      </div>
     </div>
-
-    <div class="hint">Nhấn vào thiệp để mở</div>
+    <div class="hint">Nhấn vào thư để mở 💌</div>
   </div>
 
   <script>
-    const env = document.getElementById('env');
-    const msg = document.getElementById('msg');
-    const sub = document.getElementById('sub');
-
-    function openEnvelope() {
-      if (!env.classList.contains('open')) {
-        env.classList.add('open');
-        // reveal text with a slight delay
-        setTimeout(()=>{ msg.style.opacity = 1; msg.style.transform = 'translateY(0)'; }, 220);
-        setTimeout(()=>{ sub.style.opacity = 1; sub.style.transform = 'translateY(0)'; }, 360);
-      } else {
-        // close back to initial
-        msg.style.opacity = 0; msg.style.transform = 'translateY(8px)';
-        sub.style.opacity = 0; sub.style.transform = 'translateY(8px)';
-        env.classList.remove('open');
-      }
-    }
-
-    env.addEventListener('click', openEnvelope);
-    env.addEventListener('keydown', e=>{ if(e.key==='Enter' || e.key===' ') openEnvelope(); });
+    const envelope = document.getElementById('envelope');
+    envelope.addEventListener('click', () => {
+      envelope.classList.toggle('open');
+    });
   </script>
 </body>
 </html>
