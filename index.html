@@ -5,126 +5,105 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Thiệp 20/10 — Mở thư 💌</title>
   <style>
-    :root {
-      --bg: #fff0f6;
-      --envelope: #ffb6c1;
-      --paper: #fff;
-      --accent: #ff5c8a;
+    :root{
+      --bg:#fff0f6; --env:#ffb6c1; --paper:#fff; --accent:#ff2e63;
     }
-    * { box-sizing: border-box; }
-    body {
-      height: 100vh;
-      margin: 0;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #fff0f6, #ffe6ef);
-      font-family: 'Poppins', sans-serif;
+    *{box-sizing:border-box}
+    body{
+      height:100vh;margin:0;display:flex;align-items:center;justify-content:center;
+      background:linear-gradient(135deg,#fff0f6,#ffe6ef);font-family:Inter, system-ui, sans-serif;
     }
 
-    .envelope {
-      position: relative;
-      width: 340px;
-      height: 240px;
-      cursor: pointer;
-      perspective: 1000px;
+    .wrap{display:flex;flex-direction:column;align-items:center;gap:12px}
+
+    .envelope{
+      width:340px;height:240px;position:relative;perspective:1200px;cursor:pointer;
     }
 
-    /* Phần thân thư */
-    .envelope-body {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: var(--envelope);
-      border-radius: 0 0 12px 12px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.15);
-      overflow: hidden;
-      z-index: 1;
+    /* thân thư */
+    .envelope-body{
+      position:absolute;width:100%;height:100%;left:0;top:0;border-radius:0 0 12px 12px;
+      background:var(--env);box-shadow:0 10px 30px rgba(0,0,0,0.12);z-index:1;overflow:hidden;
     }
 
-    /* Nắp thư */
-    .envelope-flap {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 120px;
-      background: linear-gradient(180deg, #ff9eb8, #ff7fa1);
-      clip-path: polygon(0 0, 100% 0, 50% 100%);
+    /* nắp thư */
+    .envelope-flap{
+      position:absolute;left:0;top:0;width:100%;height:120px;
+      background:linear-gradient(180deg,#ff9eb8,#ff7fa1);
+      clip-path:polygon(0 0,100% 0,50% 100%);
       transform-origin: top center;
-      transition: transform 0.8s ease-in-out;
-      z-index: 3; /* <-- cao nhất */
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+      transition: transform 0.7s cubic-bezier(.2,.9,.2,1), z-index 0.2s;
+      z-index:3;
+      pointer-events:auto;
     }
 
-    /* Tờ giấy bên trong */
-    .paper {
-      position: absolute;
-      bottom: 0;
-      left: 50%;
-      transform: translate(-50%, 80%);
-      width: 90%;
-      height: 160px;
-      background: var(--paper);
-      border-radius: 10px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      transition: transform 0.8s ease-in-out, opacity 0.5s ease;
-      opacity: 0;
-      z-index: 2; /* <-- nằm giữa flap và body */
+    /* mặt sau mịn (tránh nhìn thấy khi quay) */
+    .envelope-flap::after{
+      content:"";position:absolute;inset:0;background:linear-gradient(180deg,#ff9eb8,#ff7fa1);
+      backface-visibility:hidden;transform:translateZ(-1px);
     }
 
-    .message h1 {
-      margin: 0;
-      font-size: 28px;
-      color: #ff2e63;
-    }
-    .message p {
-      margin: 8px 0 0;
-      color: #444;
-      font-size: 16px;
-    }
-
-    /* Khi mở */
-    .open .envelope-flap {
-      transform: rotateX(180deg);
-      z-index: 0; /* <-- đẩy flap ra sau để không che giấy */
-    }
-    .open .paper {
-      transform: translate(-50%, -20%);
-      opacity: 1;
+    /* tờ giấy */
+    .paper{
+      position:absolute;left:50%;transform:translate(-50%,85%);bottom:0;
+      width:88%;height:160px;background:var(--paper);border-radius:10px;
+      box-shadow:0 6px 18px rgba(0,0,0,0.12);
+      display:flex;align-items:center;justify-content:center;flex-direction:column;
+      transition:transform 0.7s cubic-bezier(.2,.9,.2,1),opacity 0.45s;
+      opacity:0;z-index:4; /* đảm bảo luôn trên flap khi mở */
+      padding:18px;
     }
 
-    .hint {
-      text-align: center;
-      margin-top: 12px;
-      color: #666;
-      font-size: 14px;
+    .message h1{margin:0;font-size:28px;color:var(--accent);text-align:center}
+    .message p{margin:8px 0 0;color:#444;text-align:center}
+
+    /* trạng thái mở */
+    .envelope.open .envelope-flap{
+      transform: rotateX(-155deg) translateY(-12px);
+      z-index:2;            /* thấp hơn paper nhưng vẫn > body */
+      pointer-events:none;  /* tránh chặn click */
     }
+    .envelope.open .paper{
+      transform:translate(-50%,-12%);
+      opacity:1;
+    }
+
+    .hint{color:#666;font-size:14px;text-align:center}
+    @media (max-width:420px){.envelope{width:300px;height:210px}.paper{height:150px}}
   </style>
 </head>
 <body>
-  <div>
-    <div id="envelope" class="envelope">
-      <div class="envelope-flap"></div>
+  <div class="wrap">
+    <div id="env" class="envelope" aria-label="Thiệp 20/10, nhấn để mở" role="button" tabindex="0">
+      <div class="envelope-flap" id="flap"></div>
       <div class="envelope-body"></div>
-      <div class="paper">
+
+      <div class="paper" id="paper">
         <div class="message">
           <h1>20/10 Vui Vẻ 🎉</h1>
-          <p>Chúc bạn luôn xinh đẹp, rạng rỡ và hạnh phúc nhé 💖</p>
+          <p>Chúc bạn luôn xinh đẹp, rạng rỡ và tràn đầy niềm vui 💖</p>
         </div>
       </div>
     </div>
-    <div class="hint">Nhấn vào thư để mở 💌</div>
+
+    <div class="hint">Nhấn vào thiệp để mở / nhấn lại để đóng</div>
   </div>
 
   <script>
-    const envelope = document.getElementById('envelope');
-    envelope.addEventListener('click', () => {
-      envelope.classList.toggle('open');
-    });
+    const env = document.getElementById('env');
+    // hỗ trợ click và phím Space/Enter
+    env.addEventListener('click', toggle);
+    env.addEventListener('keydown', e => { if(e.key===' '|| e.key==='Enter') { e.preventDefault(); toggle(); } });
+
+    function toggle(){
+      env.classList.toggle('open');
+      // đôi khi cần chút delay để z-index thay đổi mượt
+    }
+
+    // Debug helper: nếu vẫn không thấy, in trạng thái
+    // console.log('Script loaded');
   </script>
 </body>
 </html>
